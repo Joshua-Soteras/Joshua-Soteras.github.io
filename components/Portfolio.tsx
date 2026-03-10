@@ -26,6 +26,37 @@ const FRAME_MS        = 40;   // ms per scramble frame (~400ms total)
 const scramble = (s: string) =>
   s.split('').map(c => (c === ' ' ? ' ' : GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)])).join('');
 
+function useCyclingLabel(phrases: readonly string[]): string {
+  const [label, setLabel] = useState<string>(phrases[0]);
+  const idx = useRef(0);
+
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>;
+
+    const cycle = () => {
+      idx.current = (idx.current + 1) % phrases.length;
+      const target = phrases[idx.current];
+      let frame = 0;
+      const iv = setInterval(() => {
+        frame++;
+        if (frame < SCRAMBLE_FRAMES) {
+          setLabel(target.split('').map(c => (c === ' ' ? ' ' : GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)])).join(''));
+        } else {
+          clearInterval(iv);
+          setLabel(target);
+          timeout = setTimeout(cycle, 3000 + Math.random() * 2000);
+        }
+      }, FRAME_MS);
+    };
+
+    timeout = setTimeout(cycle, 3000 + Math.random() * 2000);
+    return () => clearTimeout(timeout);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return label;
+}
+
 function useScramble(target: string, active: boolean) {
   const [text, setText] = useState(target);
   useEffect(() => {
@@ -164,7 +195,6 @@ function ProjectCard({ title, desc, tags, index, image, href }: {
             : <span className="text-[8px] font-mono border border-foreground/30 px-1.5 py-0.5 text-foreground/40 shrink-0">LOCKED</span>
           }
         </div>
-        <p className="text-sm text-foreground/70 leading-relaxed">{desc}</p>
         <div className="flex flex-wrap gap-2">
           {tags.map((tag) => (
             <span key={tag} className="text-[10px] px-2 py-1 border border-foreground/20 font-mono uppercase">
@@ -172,6 +202,7 @@ function ProjectCard({ title, desc, tags, index, image, href }: {
             </span>
           ))}
         </div>
+        <p className="text-sm text-foreground/70 leading-relaxed">{desc}</p>
         {/* Decrypt / Encrypt bar */}
         <div className="space-y-1 pt-1">
           <div className="flex justify-between items-center">
@@ -340,14 +371,14 @@ export default function Portfolio() {
     {
       title: "VISIO_MEMORIA",
       desc: "A real-time facial recognition pipeline combining YOLOv8-Face detection with DINOv3 ViT-B/16 embeddings, running locally on Apple Silicon with a planned FAISS + SQLite identity database.",
-      tags: ["Python", "PyTorch", "DINOv3", "YOLOv8", "RAG", "FAISS", "SQLite3"],
+      tags: ["Python", "PyTorch", "YOLOv8", "DINOv3", "RAG"],
       image: "/assets/images/projects/vm_cropped.png",
       href: "https://github.com/Joshua-Soteras/Visio_Memoria",
     },
     {
       title: "END-TO-END DIFFERENTIABLE 3D RECONSTRUCTION",
       desc: "Building a unified, end-to-end differentiable pipeline that addresses current constraints in Structure from Motion (SfM) for more robust, context-aware 3D spatial models.",
-      tags: ["Python", "PyTorch", "NumPy & SciPy", "COLMAP", "DINOv3"],
+      tags: ["Python", "PyTorch", "COLMAP", "DINOv3"],
       image: "/assets/images/projects/thesis-logo.png",
     },
     {
@@ -373,6 +404,9 @@ export default function Portfolio() {
     },
   ];
 
+  const projectsLabel    = useCyclingLabel(['PROJECTS', 'VĪSIŌ_CREĀTŌRIS'] as const);
+  const experienceLabel  = useCyclingLabel(['EXPERIENCE', 'OPERA_ET_EXPERIENTIA'] as const);
+  const projectsSubLabel = useCyclingLabel(['A collection of experimental builds and production-ready systems.', 'Fabricae experimentales et systemata parata.'] as const);
   const [hoveredExp, setHoveredExp] = useState<number | null>(null);
   const [photoGlitch, setPhotoGlitch] = useState(false);
   const [detLabel, setDetLabel] = useState('ENGINEER_DETECTED');
@@ -634,13 +668,9 @@ export default function Portfolio() {
             <GlitchReveal as="h2" className="text-sm font-mono text-foreground/50 uppercase tracking-[0.3em]">
               {"// CHECKPOINTS"}
             </GlitchReveal>
-            <GlitchReveal as="h3" className="text-4xl font-bold tracking-tighter">
-              PROJECT_LOGS
-            </GlitchReveal>
+            <h3 className="text-4xl font-bold tracking-tighter">{projectsLabel}</h3>
           </div>
-          <GlitchReveal as="p" className="text-xs font-mono text-foreground/40 max-w-xs">
-            A collection of experimental builds and production-ready systems.
-          </GlitchReveal>
+          <p className="text-xs font-mono text-foreground/40 max-w-xs">{projectsSubLabel}</p>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((p, i) => (
@@ -659,9 +689,7 @@ export default function Portfolio() {
             <GlitchReveal as="h2" className="text-sm font-mono text-foreground/50 uppercase tracking-[0.3em]">
               {"// LOGS"}
             </GlitchReveal>
-            <GlitchReveal as="h3" className="text-4xl font-bold tracking-tighter">
-              EXPERIENCE
-            </GlitchReveal>
+            <h3 className="text-4xl font-bold tracking-tighter">{experienceLabel}</h3>
           </div>
           <div className="md:col-span-2 space-y-12">
             {experiences.map((exp, i) => (

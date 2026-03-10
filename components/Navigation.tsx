@@ -20,7 +20,7 @@ export default function Navigation() {
 
   const tabs = [
     { name: 'ABOUT', id: 'about' },
-    { name: 'PROJECT_LOGS', id: 'projects' },
+    { name: 'PROJECTS', id: 'projects' },
     { name: 'EXPERIENCE', id: 'experience' },
     { name: 'CONTACT', id: 'contact' },
   ];

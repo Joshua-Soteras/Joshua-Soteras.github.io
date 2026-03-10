@@ -101,17 +101,6 @@ export default function BootSequence({ onComplete }: { onComplete: () => void })
               ))}
             </div>
 
-            {/* ASCII Art Placeholder */}
-            <pre className="text-[8px] leading-[8px] opacity-30 select-none">
-              {`
-   _____ _      _____ _______ _____ _    _ 
-  / ____| |    |_   _|__   __/ ____| |  | |
- | |  __| |      | |    | | | |    | |__| |
- | | |_ | |      | |    | | | |    |  __  |
- | |__| | |____ _| |_   | | | |____| |  | |
-  \\_____|______|_____|  |_|  \\_____|_|  |_|
-              `}
-            </pre>
           </div>
         </motion.div>
       )}
