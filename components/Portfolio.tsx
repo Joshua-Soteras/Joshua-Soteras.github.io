@@ -405,9 +405,11 @@ export default function Portfolio() {
   ];
 
   const projectsLabel    = useCyclingLabel(['PROJECTS', 'VĪSIŌ_CREĀTŌRIS'] as const);
-  const experienceLabel  = useCyclingLabel(['EXPERIENCE', 'OPERA_ET_EXPERIENTIA'] as const);
+  const experienceLabel  = useCyclingLabel(['EXPERIENCE', 'EXPERIENTIA'] as const);
   const projectsSubLabel = useCyclingLabel(['A collection of experimental builds and production-ready systems.', 'Fabricae experimentales et systemata parata.'] as const);
+  const PHOTOS = ['/assets/images/profile.png', '/assets/images/profile_pt2.PNG'];
   const [hoveredExp, setHoveredExp] = useState<number | null>(null);
+  const [photoIndex, setPhotoIndex] = useState(0);
   const [photoGlitch, setPhotoGlitch] = useState(false);
   const [detLabel, setDetLabel] = useState('ENGINEER_DETECTED');
   const [detConf, setDetConf]   = useState('0.97');
@@ -418,6 +420,7 @@ export default function Portfolio() {
     let innerTimer: ReturnType<typeof setTimeout>;
     const burst = () => {
       setPhotoGlitch(true);
+      setPhotoIndex(prev => prev === 0 ? 1 : 0);
       innerTimer = setTimeout(() => {
         setPhotoGlitch(false);
         setDetFrame(prev => prev + Math.floor(Math.random() * 30) + 5);
@@ -570,27 +573,34 @@ export default function Portfolio() {
             {/* aspect-ratio on the img itself — simplest, no absolute positioning needed */}
             <div style={{ overflow: 'hidden', position: 'relative' }} className={photoGlitch ? 'photo-glitching' : ''}>
               {/* Main image wrapped for jitter animation */}
-              <div className="photo-slice-wrap">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/assets/images/profile.png"
-                  alt="Joshua Soteras"
-                  style={{
-                    display: 'block',
-                    width: '100%',
-                    aspectRatio: '1 / 1',
-                    objectFit: 'cover',
-                    objectPosition: 'center',
-                    filter: 'grayscale(100%) contrast(1.1) brightness(0.9)',
-                    transition: 'transform 700ms',
-                  }}
-                  className="group-hover:scale-110"
-                />
+              <div className="photo-slice-wrap" style={{ position: 'relative' }}>
+                {PHOTOS.map((src, i) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    key={src}
+                    src={src}
+                    alt={i === 0 ? 'Joshua Soteras' : ''}
+                    aria-hidden={i !== 0}
+                    style={{
+                      display: 'block',
+                      width: '100%',
+                      aspectRatio: '1 / 1',
+                      objectFit: 'cover',
+                      objectPosition: 'center',
+                      filter: 'grayscale(100%) contrast(1.1) brightness(0.9)',
+                      position: i === 0 ? 'relative' : 'absolute',
+                      inset: 0,
+                      opacity: i === photoIndex ? 1 : 0,
+                      transition: photoGlitch ? 'opacity 0.35s steps(4, end)' : 'none',
+                    }}
+                    className="group-hover:scale-110"
+                  />
+                ))}
               </div>
               {/* Ghost image — red channel (chromatic aberration) */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/assets/images/profile.png"
+                src={PHOTOS[photoIndex]}
                 alt=""
                 aria-hidden="true"
                 className="chroma-r absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none opacity-0"
@@ -603,7 +613,7 @@ export default function Portfolio() {
               {/* Ghost image — cyan channel (chromatic aberration) */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/assets/images/profile.png"
+                src={PHOTOS[photoIndex]}
                 alt=""
                 aria-hidden="true"
                 className="chroma-c absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none opacity-0"
@@ -661,14 +671,14 @@ export default function Portfolio() {
         </motion.div>
       </section>
 
-      {/* ── Projects ───────────────────────────────────────────────────────── */}
+      {/* ── Projects ───────────────���────────��──────���───────────────────────── */}
       <section id="projects" className="max-w-7xl mx-auto px-4 py-24 border-t border-foreground/5">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
           <div className="space-y-2">
             <GlitchReveal as="h2" className="text-sm font-mono text-foreground/50 uppercase tracking-[0.3em]">
               {"// CHECKPOINTS"}
             </GlitchReveal>
-            <h3 className="text-4xl font-bold tracking-tighter">{projectsLabel}</h3>
+            <h3 className="text-xl sm:text-2xl md:text-4xl font-bold tracking-tighter whitespace-nowrap overflow-hidden">{projectsLabel}</h3>
           </div>
           <p className="text-xs font-mono text-foreground/40 max-w-xs">{projectsSubLabel}</p>
         </div>
@@ -689,7 +699,7 @@ export default function Portfolio() {
             <GlitchReveal as="h2" className="text-sm font-mono text-foreground/50 uppercase tracking-[0.3em]">
               {"// LOGS"}
             </GlitchReveal>
-            <h3 className="text-4xl font-bold tracking-tighter">{experienceLabel}</h3>
+            <h3 className="text-xl sm:text-2xl md:text-4xl font-bold tracking-tighter whitespace-nowrap overflow-hidden">{experienceLabel}</h3>
           </div>
           <div className="md:col-span-2 space-y-12">
             {experiences.map((exp, i) => (
